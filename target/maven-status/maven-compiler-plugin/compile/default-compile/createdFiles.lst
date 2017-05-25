@@ -1,0 +1,4 @@
+com/facebook/presto/plugin/vertica/VerticaClient.class
+com/facebook/presto/plugin/vertica/VerticaClientModule.class
+com/facebook/presto/plugin/vertica/VerticaPlugin.class
+com/facebook/presto/plugin/vertica/VerticaConfig.class
