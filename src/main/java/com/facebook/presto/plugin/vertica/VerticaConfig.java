@@ -13,7 +13,12 @@
  */
 package com.facebook.presto.plugin.vertica;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.validation.constraints.Min;
+
 import io.airlift.configuration.Config;
+import io.airlift.units.Duration;
 
 /**
  * To get the custom properties to connect to the database. User, password and
@@ -21,7 +26,7 @@ import io.airlift.configuration.Config;
  * custom configuration it should be put in here.
  * 
  * @author Brailovskiy Lev
- *
+ * @author jithin ravi
  */
 public class VerticaConfig {
 
@@ -29,7 +34,48 @@ public class VerticaConfig {
 	private String password;
 	private String url;
 	private String schema;
+	 private boolean autoReconnect = true;
+	    private int maxReconnects = 3;
+	    private Duration connectionTimeout = new Duration(10, TimeUnit.SECONDS);
 
+	    public boolean isAutoReconnect()
+	    {
+	        return autoReconnect;
+	    }
+
+	    @Config("vertica.auto-reconnect")
+	    public VerticaConfig setAutoReconnect(boolean autoReconnect)
+	    {
+	        this.autoReconnect = autoReconnect;
+	        return this;
+	    }
+
+	    @Min(1)
+	    public int getMaxReconnects()
+	    {
+	        return maxReconnects;
+	    }
+
+	    @Config("vertica.max-reconnects")
+	    public VerticaConfig setMaxReconnects(int maxReconnects)
+	    {
+	        this.maxReconnects = maxReconnects;
+	        return this;
+	    }
+
+	    public Duration getConnectionTimeout()
+	    {
+	        return connectionTimeout;
+	    }
+
+	    @Config("vertica.connection-timeout")
+	    public VerticaConfig setConnectionTimeout(Duration connectionTimeout)
+	    {
+	        this.connectionTimeout = connectionTimeout;
+	        return this;
+	    }
+	
+	
 	/**
 	 * @return the user
 	 */

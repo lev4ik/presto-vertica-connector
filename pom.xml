@@ -19,7 +19,7 @@
 	</developers>
 
 	<properties>
-		<dep.presto.version>0.176</dep.presto.version>
+		<dep.presto.version>0.213</dep.presto.version>
         <dep.airlift.version>0.128</dep.airlift.version>
         <dep.slice.version>0.21</dep.slice.version>
 	</properties>
@@ -83,9 +83,9 @@
 		<dependency>
 			<groupId>com.vertica.jdbc</groupId>
 			<artifactId>vertica-jdbc</artifactId>
-			<version>7.2.3-0</version>
+			<version>8.0.1-6</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/vertica-jdbc-7.2.3-0.jar</systemPath>
+			<systemPath>${project.basedir}/src/main/resources/vertica-jdbc-8.0.1-6.jar</systemPath>
 		</dependency>
 
 		<!-- Presto SPI -->

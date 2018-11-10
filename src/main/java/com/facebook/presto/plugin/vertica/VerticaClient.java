@@ -16,6 +16,7 @@ package com.facebook.presto.plugin.vertica;
 import static java.util.Locale.ENGLISH;
 
 import java.sql.*;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -26,12 +27,14 @@ import org.apache.log4j.Logger;
 
 import com.facebook.presto.plugin.jdbc.BaseJdbcClient;
 import com.facebook.presto.plugin.jdbc.BaseJdbcConfig;
+import com.facebook.presto.plugin.jdbc.ConnectionFactory;
+import com.facebook.presto.plugin.jdbc.DriverConnectionFactory;
 import com.facebook.presto.plugin.jdbc.JdbcConnectorId;
 import com.facebook.presto.spi.SchemaTableName;
 import com.facebook.presto.spi.type.Type;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
-
+import static com.facebook.presto.plugin.jdbc.DriverConnectionFactory.basicConnectionProperties;
 /**
  * Implementation of VerticaClient. It describes table, schemas and columns behaviours.
  * It allows to change the QueryBuilder to a custom one as well.
@@ -46,10 +49,31 @@ public class VerticaClient extends BaseJdbcClient {
 	@Inject
 	public VerticaClient(JdbcConnectorId connectorId, BaseJdbcConfig config, VerticaConfig verticaConfig)
 			throws SQLException {
-		super(connectorId, config, "", new Driver());
+		super(connectorId, config, "", connectionFactory(config, verticaConfig));
 		//connectionProperties.setProperty("SEARCH_PATH", verticaConfig.getSchema());
 	}
 
+	 private static ConnectionFactory connectionFactory(BaseJdbcConfig config, VerticaConfig verticaConfig)
+	            throws SQLException
+	    {
+	        Properties connectionProperties = basicConnectionProperties(config);
+	        connectionProperties.setProperty("useInformationSchema", "true");
+	        connectionProperties.setProperty("nullCatalogMeansCurrent", "false");
+	        connectionProperties.setProperty("useUnicode", "true");
+	        connectionProperties.setProperty("characterEncoding", "utf8");
+	        connectionProperties.setProperty("tinyInt1isBit", "false");
+	        if (verticaConfig.isAutoReconnect()) {
+	            connectionProperties.setProperty("autoReconnect", String.valueOf(verticaConfig.isAutoReconnect()));
+	            connectionProperties.setProperty("maxReconnects", String.valueOf(verticaConfig.getMaxReconnects()));
+	        }
+	        if (verticaConfig.getConnectionTimeout() != null) {
+	            connectionProperties.setProperty("connectTimeout", String.valueOf(verticaConfig.getConnectionTimeout().toMillis()));
+	        }
+
+	        return new DriverConnectionFactory(new Driver(), config.getConnectionUrl(), connectionProperties);
+	    }
+
+	
 	/*@Override
 	public Set<String> getSchemaNames() {
 		try (Connection connection = driver.connect(connectionUrl, connectionProperties);
